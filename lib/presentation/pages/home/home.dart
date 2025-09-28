@@ -24,10 +24,8 @@ class _HomeState extends State<Home> {
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
-        bool isDesktop = constraints.maxWidth > constraints.maxHeight;
+        bool isDesktop = constraints.maxWidth > constraints.maxHeight * 1.2;
         return Scaffold(
-          appBar: AppBar(title: Text("Algorithm Visualizer")),
-
           bottomNavigationBar: isDesktop
               ? null
               : BottomNavigationBar(
@@ -42,24 +40,28 @@ class _HomeState extends State<Home> {
             children: [
               Visibility(
                 visible: isDesktop,
-                child: Column(
-                  spacing: 4,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: List.generate(
-                    algo.keys.length,
-                    (index) => NavigationStructure(
-                      title: algo.keys.elementAt(index),
-                      callback: (i) => changeType(index, subType: i),
-                      isSelected: type == index,
-                      subType: subType,
-                      label: algo.values.elementAt(index),
+                child: Padding(
+                  padding: const EdgeInsets.only(right: 16),
+                  child: Column(
+                    spacing: 4,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: List.generate(
+                      algo.keys.length,
+                      (index) => NavigationStructure(
+                        title: algo.keys.elementAt(index),
+                        callback: (i) => changeType(index, subType: i),
+                        isSelected: type == index,
+                        subType: subType,
+                        label: algo.values.elementAt(index),
+                      ),
                     ),
                   ),
                 ),
               ),
               Expanded(
                 child: Body(
+                  isDesktop: isDesktop,
                   key: ValueKey(type),
                   controller: controller,
                   algo: algoWidgets[type],
@@ -124,13 +126,13 @@ class NavigationButton extends StatelessWidget {
   Widget build(BuildContext context) => InkWell(
     splashFactory: InkSparkle.splashFactory,
     onTap: onTap,
-    borderRadius: BorderRadius.horizontal(right: Radius.circular(16)),
+    borderRadius: BorderRadius.horizontal(right: Radius.circular(32)),
     child: Container(
       padding: EdgeInsets.fromLTRB(16, 12, 30, 12),
       width: 100 + MediaQuery.of(context).size.width * 0.1,
       decoration: BoxDecoration(
         color: isSelected ? Theme.of(context).colorScheme.primaryContainer : null,
-        borderRadius: BorderRadius.horizontal(right: Radius.circular(16)),
+        borderRadius: BorderRadius.horizontal(right: Radius.circular(32)),
       ),
 
       child: Text(

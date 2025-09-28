@@ -6,15 +6,15 @@ class Body extends StatelessWidget {
   final int initialPage;
   final void Function(int)? onPageChanged;
   final PageController controller;
-  const Body({super.key, required this.algo, this.initialPage = 0, this.onPageChanged, required this.controller});
+  final bool isDesktop;
+  const Body({super.key, required this.algo, this.initialPage = 0, this.onPageChanged, required this.controller, this.isDesktop = false});
 
   @override
   Widget build(BuildContext context) {
-    return PageView.builder(
-      controller: controller,
-      itemCount: algo.length,
-      onPageChanged: onPageChanged,
-      itemBuilder: (context, index) => algo[index],
+    return Card(
+      color: Theme.of(context).colorScheme.inversePrimary,
+      margin: !isDesktop ? EdgeInsets.zero : const EdgeInsets.all(6),
+      child: PageView.builder(controller: controller, itemCount: algo.length, onPageChanged: onPageChanged, itemBuilder: (context, index) => algo[index]),
     );
   }
 }
