@@ -4,7 +4,7 @@ class InsertionSortProvider extends SortProvider {
 
 
   @override
-  Future<void> runAlgorithm() async {
+  Future<void> onExecute() async {
     await insertionSort();
   }
 

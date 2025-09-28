@@ -1,112 +1,100 @@
-// base_provider.dart
 import 'dart:async';
 import 'package:flutter/material.dart';
 
-// The enum definition from above
+// The generic state enum you suggested.
 enum ExecutionState { initial, running, paused, completed }
 
-abstract class BaseAlgorithmProvider extends ChangeNotifier {
+abstract class ExecutionProvider extends ChangeNotifier {
   // --- STATE MANAGEMENT ---
-  final ValueNotifier<ExecutionState> _state = ValueNotifier(ExecutionState.initial);
-  ValueNotifier<ExecutionState> get state => _state;
-  ExecutionState get getState => _state.value;
+  final ValueNotifier<ExecutionState> executionState = ValueNotifier(ExecutionState.initial);
 
-  double _executionSpeed = 0.5;
-  double get executionSpeed => _executionSpeed;
+  ValueNotifier<ExecutionState> get state => executionState;
 
-  // --- PRIVATE STATE ---
-  Completer? _pauseCompleter;
   bool isCancelled = false;
+  Completer? _pauseCompleter;
+  double _executionSpeed = 0.5;
 
-  // --- PUBLIC CONTROL METHODS ---
+  // --- PUBLIC CONTROLS ---
 
+  /// Starts the execution. This is the main entry point for the UI.
   Future<void> start() async {
-    // Stop any previous run before starting a new one
-    if (getState == ExecutionState.running || getState == ExecutionState.paused) {
-      await stop();
-      await Future.delayed(const Duration(milliseconds: 50));
-    }
-
-    // Reset data before starting a sort from a completed state
-    if (getState == ExecutionState.completed) {
-      generateData();
+    // Prevent starting if already running
+    if (executionState.value == ExecutionState.running || executionState.value == ExecutionState.paused) {
+      return;
     }
 
     isCancelled = false;
-    _state.value = ExecutionState.running;
-    notifyListeners();
-
-    try {
-      await runAlgorithm();
-    } catch (e) {
-      debugPrint("Algorithm execution error: $e");
-    } finally {
-      // Only change state if it wasn't cancelled.
-      if (!isCancelled) {
-        _state.value = ExecutionState.completed;
-        onAlgorithmCompleted(); // Call completion hook
-      } else {
-        // If cancelled, go back to initial state
-        _state.value = ExecutionState.initial;
-      }
-      notifyListeners();
+    executionState.value = ExecutionState.running;
+    // Await the specific work defined by the subclass
+    await onExecute();
+    // Set final state only if the process wasn't cancelled
+    if (!isCancelled) {
+      executionState.value = ExecutionState.completed;
     }
   }
 
+  /// Pauses the current execution.
   void pause() {
-    if (getState != ExecutionState.running) return;
-    _state.value = ExecutionState.paused;
-    notifyListeners();
+    if (executionState.value != ExecutionState.running) return;
+    executionState.value = ExecutionState.paused;
   }
 
+  /// Resumes a paused execution.
   void resume() {
-    if (getState != ExecutionState.paused) return;
-    _state.value = ExecutionState.running;
+    if (executionState.value != ExecutionState.paused) return;
+    executionState.value = ExecutionState.running;
     if (_pauseCompleter != null && !_pauseCompleter!.isCompleted) {
       _pauseCompleter!.complete();
     }
-    notifyListeners();
   }
 
-  set executionSpeed(double speed) {
-    _executionSpeed = speed.clamp(0.0, 1.0);
-    notifyListeners();
-  }
-
-  // --- PROTECTED / INTERNAL METHODS ---
-
-  @protected
-  Future<void> stop() async {
-    if (getState != ExecutionState.running && getState != ExecutionState.paused) return;
+  /// Stops and resets the execution.
+  void stop() {
     isCancelled = true;
-    if (getState == ExecutionState.paused) {
-      resume(); // Unpause to allow the algorithm loop to terminate
+    if (executionState.value == ExecutionState.paused) {
+      resume(); // Unblock the _waitStep() method to allow termination
     }
+    onReset(); // Let the subclass reset
+    executionState.value = ExecutionState.initial;
   }
+
+  // --- PROTECTED METHODS FOR SUBCLASSES ---
+
+  /// The pausable delay method for subclasses to use in their algorithms.
 
   @protected
   Future<void> wait() async {
-    
     final maxDelay = Durations.extralong2.inMilliseconds;
     final delay = (maxDelay * (1.0 - executionSpeed)).round();
     await Future.delayed(Duration(milliseconds: delay));
 
-    if (getState == ExecutionState.paused) {
+    if (state.value == ExecutionState.paused) {
       _pauseCompleter = Completer();
       await _pauseCompleter!.future;
     }
   }
 
-  // --- ABSTRACT METHODS (for subclasses to implement) ---
-  @protected
-  void generateData();
+  // --- ABSTRACT METHODS (Subclasses MUST implement these) ---
 
+  /// Subclasses implement this method to perform their specific algorithm.
   @protected
-  Future<void> runAlgorithm();
+  Future<void> onExecute();
 
+  /// Subclasses implement this to handle resetting their specific data (e.g., bar colors).
   @protected
-  void onAlgorithmCompleted();
+  void onReset();
 
-  @protected
-  void reset();
+  // --- GETTERS/SETTERS & DISPOSE ---
+
+  double get executionSpeed => _executionSpeed;
+  set executionSpeed(double speed) {
+    _executionSpeed = speed.clamp(0.0, 1.0);
+    notifyListeners();
+  }
+
+  @override
+  void dispose() {
+    executionState.dispose();
+    super.dispose();
+  }
 }

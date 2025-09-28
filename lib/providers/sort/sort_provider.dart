@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import '../../model/sort_model.dart';
 import '../base_provider.dart';
 
-abstract class SortProvider extends BaseAlgorithmProvider {
+abstract class SortProvider extends ExecutionProvider {
   List<SortModel> numbers = [];
 
   SortProvider() {
@@ -13,14 +13,13 @@ abstract class SortProvider extends BaseAlgorithmProvider {
 
   // --- IMPLEMENTING ABSTRACT METHODS ---
 
-  @override
   @protected
   void generateData() => numbers = List.generate(18, (_) => SortModel.create(Random().nextInt(100)), growable: false);
 
   // In SortProvider
   @override
   @protected
-  void reset() {
+ void onReset() {
     isCancelled = true;
     for (var i = 0; i < numbers.length; i++) numbers[i] = numbers[i].reset();
     numbers.shuffle();
@@ -34,7 +33,6 @@ abstract class SortProvider extends BaseAlgorithmProvider {
     notifyListeners(); // Rebuilds the bars with the new color
   }
 
-  @override
   @protected
   void onAlgorithmCompleted() {
     // This is called automatically by the base class on success.

@@ -22,7 +22,7 @@ class SortButton<T extends SortProvider> extends StatelessWidget {
                 spacing: 12,
                 children: [
                   FilledButton.tonal(onPressed: () => provider.pause(), child: const Text('Pause')),
-                  FilledButton.tonal(onPressed: () => provider.reset(), child: const Text('Reset')),
+                  FilledButton.tonal(onPressed: () => provider.onReset(), child: const Text('Reset')),
                 ],
               );
             case ExecutionState.paused:
@@ -31,11 +31,11 @@ class SortButton<T extends SortProvider> extends StatelessWidget {
                 spacing: 12,
                 children: [
                   FilledButton.tonal(onPressed: () => provider.resume(), child: const Text('Resume')),
-                  FilledButton.tonal(onPressed: () => provider.reset(), child: const Text('Reset')),
+                  FilledButton.tonal(onPressed: () => provider.onReset(), child: const Text('Reset')),
                 ],
               );
             case ExecutionState.completed:
-              return FilledButton.tonal(onPressed: () => provider.reset(), child: const Text('Reset'));
+              return FilledButton.tonal(onPressed: () => provider.onReset(), child: const Text('Reset'));
 
             case ExecutionState.initial:
               return Row(
