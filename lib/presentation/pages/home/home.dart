@@ -1,6 +1,6 @@
 import 'package:algo_vis/presentation/pages/widgets/body.dart';
+import 'package:algo_vis/presentation/pages/widgets/indicator.dart';
 import 'package:flutter/material.dart';
-
 import '../../../const.dart';
 
 class Home extends StatefulWidget {
@@ -19,7 +19,15 @@ class _HomeState extends State<Home> {
     this.subType = subType;
     controller.animateToPage(subType, duration: Duration(milliseconds: 300), curve: Curves.easeInOut);
   });
+  Widget bottomWidgetIcon(IconData icon, int length, {bool isSelected = false}) => Row(
+    mainAxisSize: MainAxisSize.min,
+    mainAxisAlignment: MainAxisAlignment.start,
+    children: [
+      Icon(icon, size: 32),
 
+      Indicator(controller: controller, count: length, isSelected: isSelected),
+    ],
+  );
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
@@ -29,9 +37,17 @@ class _HomeState extends State<Home> {
           bottomNavigationBar: isDesktop
               ? null
               : BottomNavigationBar(
-                  items: const <BottomNavigationBarItem>[
-                    BottomNavigationBarItem(icon: Icon(Icons.sort), label: 'Sort'),
-                    BottomNavigationBarItem(icon: Icon(Icons.search), label: 'Search'),
+                  landscapeLayout: BottomNavigationBarLandscapeLayout.spread,
+                  items: [
+                    BottomNavigationBarItem(
+                      icon: bottomWidgetIcon(Icons.sort, 4, isSelected: type == 0),
+                      label: 'Sort',
+                    ),
+
+                    BottomNavigationBarItem(
+                      icon: bottomWidgetIcon(Icons.search, 2, isSelected: type == 1),
+                      label: 'Search',
+                    ),
                   ],
                   currentIndex: type,
                   onTap: changeType,
