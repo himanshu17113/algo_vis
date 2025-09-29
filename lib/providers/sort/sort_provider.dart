@@ -14,14 +14,17 @@ abstract class SortProvider extends ExecutionProvider {
   // --- IMPLEMENTING ABSTRACT METHODS ---
 
   @protected
-  void generateData() => numbers = List.generate(18, (_) => SortModel.create(Random().nextInt(100)), growable: false);
+  void generateData() => numbers = List.generate(20, (_) => SortModel.create(Random().nextInt(100)), growable: false);
 
   // In SortProvider
+
+
   @override
-  @protected
- void onReset() {
+  void onReset() {
     isCancelled = true;
-    for (var i = 0; i < numbers.length; i++) numbers[i] = numbers[i].reset();
+    for (var i = 0; i < numbers.length; i++) {
+      numbers[i] = numbers[i].reset();
+    }
     numbers.shuffle();
     state.value = ExecutionState.initial;
     notifyListeners(); // Rebuilds the bars with the new color
