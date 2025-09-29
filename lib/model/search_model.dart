@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
-
 part 'search_model.freezed.dart';
 
 enum SearchState { open, discard, search, searched, found }
