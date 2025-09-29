@@ -5,7 +5,7 @@ class QuickSortProvider extends SortProvider {
 
 
  @override
-  Future<void> onExecute() async {
+  Future<void> onExecute([int? value]) async {
     await quickSort();
   }
 
