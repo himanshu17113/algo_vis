@@ -1,4 +1,3 @@
-import 'package:algo_vis/const.dart';
 import 'package:flutter/material.dart';
 
 class Body extends StatelessWidget {
