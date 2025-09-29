@@ -1,10 +1,12 @@
+import 'package:algo_vis/providers/search/binary_search_provider.dart';
 import 'package:flutter/material.dart';
-
 import 'package:algo_vis/presentation/sort/sort_page.dart';
 import 'package:algo_vis/providers/sort/bubble_sort_provider.dart';
 import 'package:algo_vis/providers/sort/insertion_sort_provider.dart';
 import 'package:algo_vis/providers/sort/quick_sort_provider.dart';
 import 'package:algo_vis/providers/sort/selection_sort_provider.dart';
+import 'presentation/pages/search/search_page.dart';
+import 'providers/search/linear_search_provider.dart';
 
 const Map<MapEntry<String, IconData>, List<String>> algo = {
   MapEntry("Sorting", Icons.sort): ["Bubble Sort", "Selection Sort", "Insertion Sort", "Quick Sort"],
@@ -19,7 +21,6 @@ const List<List<Widget>> algoWidgets = [
   ],
   [
     // Searching
-    Text("Linear Search"),
-    Text("Binary Search"),
+    SearchPage<LinearSearchProvider>(title: 'Linear Search'), SearchPage<BinarySearchProvider>(title: 'Binary Search'),
   ],
 ];
