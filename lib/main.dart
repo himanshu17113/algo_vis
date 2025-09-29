@@ -5,8 +5,8 @@ import 'package:algo_vis/providers/sort/bubble_sort_provider.dart';
 import 'package:algo_vis/providers/sort/insertion_sort_provider.dart';
 import 'package:algo_vis/providers/sort/quick_sort_provider.dart';
 import 'package:algo_vis/providers/sort/selection_sort_provider.dart';
-import 'package:algo_vis/route/route.dart';
-
+import 'g_variable.dart';
+import 'presentation/pages/home/home.dart';
 import 'providers/search/linear_search_provider.dart';
 
 void setupDependencies() {
@@ -23,16 +23,73 @@ void setupDependencies() {
 
 void main() {
   setupDependencies();
-  runApp(const MyApp());
+  runApp(const App());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-  // Setup GetIt in your main.dart or in a setup file
+class App extends StatefulWidget {
+  const App({super.key});
 
-  // This widget is the root of your application.
+  @override
+  State<App> createState() => _AppState();
+}
+
+class _AppState extends State<App> {
+  ThemeMode themeMode = ThemeMode.light;
+  ColorSeed colorSelected = ColorSeed.white;
+  // Determines if the light theme should be used based on the current ThemeMode.
+  bool get useLightMode {
+    switch (themeMode) {
+      case ThemeMode.system:
+        // Accessing platformBrightness via a context-aware method.
+        return View.of(context).platformDispatcher.platformBrightness == Brightness.light;
+      case ThemeMode.light:
+        return true;
+      case ThemeMode.dark:
+        return false;
+    }
+  }
+
+  // Callback to handle theme brightness changes.
+  void handleBrightnessChange({bool useLightMode = true}) {
+    setState(() {
+      themeMode = useLightMode ? ThemeMode.light : ThemeMode.dark;
+    });
+  }
+
+  // Callback to handle color seed changes.
+  void handleColorSelect(int value) {
+    setState(() {
+      colorSelected = ColorSeed.values[value];
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(debugShowCheckedModeBanner: false, title: 'Algorithm', initialRoute: Routes.home, routes: Routes.routes);
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+
+      title: 'Algorithm',
+      restorationScopeId: 'app',
+      themeMode: themeMode,
+      // Using a consistent scroll behavior across the app.
+      scrollBehavior: const ScrollBehavior().copyWith(scrollbars: false),
+      color: colorSelected.color,
+      theme: ThemeData(colorSchemeSeed: colorSelected.color, useMaterial3: true, brightness: Brightness.light),
+      // Dark theme definition.
+      darkTheme: ThemeData(colorSchemeSeed: colorSelected.color, useMaterial3: true, brightness: Brightness.dark),
+      // Setting themeAnimationDuration to zero prevents the default MaterialApp
+      // animation from conflicting with our custom AnimateTheme transition.
+      themeAnimationDuration: Duration.zero,
+      // High contrast themes for accessibility.
+      highContrastDarkTheme: ThemeData.from(colorScheme: const ColorScheme.highContrastDark(), useMaterial3: true),
+      highContrastTheme: ThemeData.from(colorScheme: const ColorScheme.highContrastLight(), useMaterial3: true),
+
+      home: Home(
+        useLightMode: useLightMode,
+        colorSelected: colorSelected,
+        handleBrightnessChange: handleBrightnessChange,
+        handleColorSelect: handleColorSelect,
+      ),
+    );
   }
 }

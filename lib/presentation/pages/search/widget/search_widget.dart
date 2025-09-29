@@ -51,9 +51,9 @@ class CustomTextStyle extends StatelessWidget {
         decoration: (state == SearchState.discard) ? TextDecoration.lineThrough : TextDecoration.none,
         decorationStyle: TextDecorationStyle.solid,
         decorationThickness: 1.7,
-        color: number.color,
+        color: state == SearchState.open ? Theme.of(context).colorScheme.onSecondaryContainer : number.color,
       ),
-      child: Center(child: Text(numberValue)),
+      child: Text(numberValue),
     );
   }
 }

@@ -43,7 +43,7 @@ class Search<T extends SearchProvider> extends StatelessWidget {
         valueListenable: GetIt.I<T>().executionState,
         builder: (context, executionState, child) => FilledButton(
           onPressed: executionState != ExecutionState.initial ? _reset : _search,
-          child: Text(executionState != ExecutionState.initial ? "Reset" : 'Search', style: TextStyle(color: Colors.white)),
+          child: Text(executionState != ExecutionState.initial ? "Reset" : 'Search'),
         ),
       ),
     ],

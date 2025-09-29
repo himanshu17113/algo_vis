@@ -2,9 +2,16 @@ import 'package:algo_vis/presentation/pages/widgets/body.dart';
 import 'package:algo_vis/presentation/pages/widgets/indicator.dart';
 import 'package:flutter/material.dart';
 import '../../../const.dart';
+import '../../../g_variable.dart';
+import '../widgets/color_seed.dart';
 
 class Home extends StatefulWidget {
-  const Home({super.key});
+  final bool useLightMode;
+  final ColorSeed colorSelected;
+  final void Function({bool useLightMode}) handleBrightnessChange;
+  final void Function(int value) handleColorSelect;
+
+  const Home({super.key, required this.useLightMode, required this.colorSelected, required this.handleBrightnessChange, required this.handleColorSelect});
 
   @override
   State<Home> createState() => _HomeState();
@@ -19,6 +26,7 @@ class _HomeState extends State<Home> {
     this.subType = subType;
     controller.animateToPage(subType, duration: Duration(milliseconds: 300), curve: Curves.easeInOut);
   });
+
   Widget bottomWidgetIcon(IconData icon, int length, {bool isSelected = false}) => Row(
     mainAxisSize: MainAxisSize.min,
     mainAxisAlignment: MainAxisAlignment.start,
@@ -28,6 +36,7 @@ class _HomeState extends State<Home> {
       Indicator(controller: controller, count: length, isSelected: isSelected),
     ],
   );
+
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
@@ -59,19 +68,37 @@ class _HomeState extends State<Home> {
                 child: Padding(
                   padding: const EdgeInsets.only(right: 16),
                   child: Column(
-                    spacing: 4,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: List.generate(
-                      algo.keys.length,
-                      (index) => NavigationStructure(
-                        title: algo.keys.elementAt(index),
-                        callback: (i) => changeType(index, subType: i),
-                        isSelected: type == index,
-                        subType: subType,
-                        label: algo.values.elementAt(index),
+                    mainAxisSize: MainAxisSize.max,
+                    children: [
+                      Column(
+                        spacing: 4,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: List.generate(
+                          algo.keys.length,
+                          (index) => NavigationStructure(
+                            title: algo.keys.elementAt(index),
+                            callback: (i) => changeType(index, subType: i),
+                            isSelected: type == index,
+                            subType: subType,
+                            label: algo.values.elementAt(index),
+                          ),
+                        ),
                       ),
-                    ),
+                      SizedBox(
+                        width: MediaQuery.of(context).size.width * 0.15,
+
+                        child: ColorSeedButton(handleColorSelect: widget.handleColorSelect, colorSelected: widget.colorSelected),
+                      ),
+
+                      Align(
+                        alignment: Alignment.bottomLeft,
+                        child: IconButton(
+                          onPressed: () => widget.handleBrightnessChange(useLightMode: !widget.useLightMode),
+                          icon: Icon(widget.useLightMode ? Icons.light_mode : Icons.dark_mode, size: 32),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ),
