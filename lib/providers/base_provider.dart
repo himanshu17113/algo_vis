@@ -17,7 +17,7 @@ abstract class ExecutionProvider extends ChangeNotifier {
   // --- PUBLIC CONTROLS ---
 
   /// Starts the execution. This is the main entry point for the UI.
-  Future<void> start() async {
+  Future<void> start([int? value]) async {
     // Prevent starting if already running
     if (executionState.value == ExecutionState.running || executionState.value == ExecutionState.paused) {
       return;
@@ -26,7 +26,7 @@ abstract class ExecutionProvider extends ChangeNotifier {
     isCancelled = false;
     executionState.value = ExecutionState.running;
     // Await the specific work defined by the subclass
-    await onExecute();
+    await onExecute(value);
     // Set final state only if the process wasn't cancelled
     if (!isCancelled) {
       executionState.value = ExecutionState.completed;
@@ -78,7 +78,7 @@ abstract class ExecutionProvider extends ChangeNotifier {
 
   /// Subclasses implement this method to perform their specific algorithm.
   @protected
-  Future<void> onExecute();
+  Future<void> onExecute([int? value]);
 
   /// Subclasses implement this to handle resetting their specific data (e.g., bar colors).
   @protected
