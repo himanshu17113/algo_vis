@@ -3,7 +3,7 @@ import 'package:algo_vis/providers/sort/sort_provider.dart';
 
 class BubbleSortProvider extends SortProvider {
   @override
-  Future<void> onExecute() async {
+  Future<void> onExecute([int? value]) async {
     await bubbleSort();
   }
 
